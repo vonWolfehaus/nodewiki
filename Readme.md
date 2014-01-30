@@ -48,18 +48,15 @@ Listen on localhost only. This is equivalent to `--addr=127.0.0.1`.
 
 `-g`  
 `--git`  
-`git` (depricated)  
 Commit each save to a git repository.
 
 `-h`  
-`--help`  
-`help` (depricated)  
+`--help`
 Display a short help message.
 
 `-p <port>`  
 `--port=<port>`  
-`--port <port>`  
-`<port>` (depricated)  
+`--port <port>`
 Listen on <port> rather than 8888. The default port can be changed
 from 8888 by setting the PORT environment variable.
 

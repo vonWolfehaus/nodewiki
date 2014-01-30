@@ -1,6 +1,8 @@
 $(document).ready(function(){
 
 	var rawMd, fileName, internalLinks;
+	
+	// replace this by instantiating von-edit on editables after the md is loaded
 	var editingAllowed = false; //dont allow editing until something is loaded
 
 	var socket = io.connect();
