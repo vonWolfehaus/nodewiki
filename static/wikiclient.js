@@ -1,6 +1,17 @@
 $(document).ready(function(){
 
 	var rawMd, fileName, internalLinks;
+	var scrollTimer;
+	window.addEventListener('scroll', function() {
+		clearTimeout(scrollTimer);
+		if(!document.body.classList.contains('disable-hover')) {
+			document.body.classList.add('disable-hover')
+		}
+
+		scrollTimer = setTimeout(function(){
+			document.body.classList.remove('disable-hover')
+		}, 500);
+	}, false);
 	
 	// replace this by instantiating von-edit on editables after the md is loaded
 	var editingAllowed = false; //dont allow editing until something is loaded

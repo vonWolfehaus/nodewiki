@@ -1,4 +1,4 @@
-#Von Node Wiki
+# Von Node Wiki
 
 A simple git based wiki system for markdown files written in node.js.
 

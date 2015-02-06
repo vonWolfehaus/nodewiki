@@ -1,17 +1,21 @@
 #!/usr/bin/env node
 
-var fs = require("fs");
-var http = require("http");
-var path = require("path");
-var connect = require("connect");
-var socketio = require("socket.io");
+var fs = require('fs');
+var http = require('http');
+var path = require('path');
+var connect = require('connect');
+var socketio = require('socket.io');
 var mod_getopt = require('posix-getopt');
-var mdserver = require("./lib/mdserver");
-var getDir = require("./lib/getDir");
+var compression = require('compression');
+var serveStatic = require('serve-static');
+
+var mdserver = require('./lib/mdserver');
+var getDir = require('./lib/getDir');
 
 // Defaults
 var portNumberDefault = process.env.PORT || 8888;
-var listenAddr = process.env.NW_ADDR || "";    // "" ==> INADDR_ANY
+var listenAddr = process.env.NW_ADDR || '';    // '' ==> INADDR_ANY
+
 exports.gitMode = false;  // exported for lib/mdserver.js
 
 var portNumber = portNumberDefault;
@@ -29,13 +33,13 @@ while ((option = parser.getopt()) !== undefined) {
 		break;
 
 	case 'g':
-		if (fs.existsSync(process.cwd() + '/.git')){
+		if (fs.existsSync(process.cwd() + '/.git')) {
 			exports.gitMode = true;
 		} else {
 			console.log(
 				'ERROR: No git repository found\n',
 				'\'--git\' requires a git repository in the current directory.\n',
-				'Type "git init" to create one.');
+				'Type \'git init\' to create one.');
 			process.exit(1);
 		}
 		break;
@@ -46,17 +50,17 @@ while ((option = parser.getopt()) !== undefined) {
 		break;
 
 	case 'l':
-		if (listenAddr != "") {
-			console.log("ERROR: Conflicting use of --addr and --local.\n",
-									"Use only one.");
+		if (listenAddr != '') {
+			console.log('ERROR: Conflicting use of --addr and --local.\n',
+									'Use only one.');
 			process.exit(1);
 		}
-		listenAddr = "localhost";
+		listenAddr = 'localhost';
 		break;
 
 	case 'p':
 		var argPort = parseInt(option.optarg);
-		if (typeof argPort == 'number' && argPort > 0){
+		if (typeof argPort == 'number' && argPort > 0) {
 			portNumber = argPort;
 		} else {
 			console.log('ERROR: %s is not a valid port number.\n', option.optarg);
@@ -73,7 +77,7 @@ while ((option = parser.getopt()) !== undefined) {
 	}
 }
 
-function showHelp(){
+function showHelp() {
 	console.log('VonWiki', '\n---------');
 	showUsage();
 }
@@ -84,7 +88,7 @@ function showUsage() {
 		'  -a | --addr   IPv4 listen address (default = any)\n',
 		'  -g | --git    Commit each save to a git repository\n',
 		'  -h | --help   Print this message\n',
-		'  -l | --local  Listen on "localhost" (127.0.0.1) only.\n',
+		'  -l | --local  Listen on \'localhost\' (127.0.0.1) only.\n',
 		'  -p | --port   Use the specified port'
 	);
 }
@@ -93,29 +97,30 @@ function showUsage() {
 
 
 var app = connect();
-app.use(connect.logger('dev'));
-app.use(connect.static(__dirname + '/static'));
 
-app.use('/', function(req, res){
-	res.end(fs.readFileSync(__dirname + '/static/index.html', 'utf-8'));
-});
+// gzip/deflate outgoing responses
+app.use(compression());
+
+app.use(serveStatic(__dirname + '/static'));
 
 var server = http.createServer(app);
 server.listen(portNumber, listenAddr);
-io = socketio.listen(server);
-io.set('log level', 2);
+
+var io = socketio({
+	// config
+}).listen(server);
 
 var allFiles = null;
 
-io.sockets.on('connection', function (socket){
+io.sockets.on('connection', function (socket) {
 	var currentPath = process.cwd() + '/';
 	var dir = getDir.getDir(currentPath);
 	var links = getDir.parseLinks(dir);
 	var directoryDepth = 0;
 	var dirFolders = []; // array to hold the names of all folders in current directory
 	
-	dir.forEach(function(i){
-		if (i.folder == true){
+	dir.forEach(function(i) {
+		if (i.folder == true) {
 			dirFolders.push(i.name);
 		}
 	});
@@ -124,9 +129,9 @@ io.sockets.on('connection', function (socket){
 	allFiles = getDir.getAllFiles(currentPath);
 	// console.log(allFiles);
 	
-	socket.on('readFile', function (file){
-		console.log('readFile recieved - ' + file.name);
-		if(dirFolders.indexOf(file.name) > -1){ // checks if request is in the dirFolders array (meaning that the request is for a folder)
+	socket.on('readFile', function (file) {
+		console.log('readFile received - ' + file.name);
+		if (dirFolders.indexOf (file.name) > -1) { // checks if request is in the dirFolders array (meaning that the request is for a folder)
 			currentPath += file.name;
 			refreshDir();
 			directoryDepth += 1;
@@ -137,7 +142,7 @@ io.sockets.on('connection', function (socket){
 		}
 	});
 
-	socket.on('disconnect', function(){
+	socket.on('disconnect', function() {
 		// if a user disconnects, reset variables
 		currentPath = process.cwd() + '/';
 		refreshDir();
@@ -145,14 +150,14 @@ io.sockets.on('connection', function (socket){
 		directoryDepth = 0;
 	});
 
-	socket.on('saveFile', function (file){
-		console.log('saveFile recieved, file: ' + file.name);
+	socket.on('saveFile', function (file) {
+		console.log('saveFile received, file: ' + file.name);
 		mdserver.saveFile(file, currentPath, socket);
 	});
 
-	socket.on('goBackFolder', function(){
-		if (directoryDepth > 0){
-			currentPath = currentPath.substr(0, currentPath.substr(0, currentPath.length - 1).lastIndexOf('/')) + '/'; // removes current directory form the currentPath variable
+	socket.on('goBackFolder', function() {
+		if (directoryDepth > 0) {
+			currentPath = currentPath.substr(0, currentPath.substr(0, currentPath.length - 1).lastIndexOf ('/')) + '/'; // removes current directory form the currentPath variable
 			refreshDir();
 			directoryDepth -= 1;
 			links = getDir.parseLinks(dir, directoryDepth);
@@ -160,13 +165,13 @@ io.sockets.on('connection', function (socket){
 		}
 	})
 
-	socket.on('refreshNav', function(){
+	socket.on('refreshNav', function() {
 		refreshNavLinks();
 	});
 
-	socket.on('newFolder', function(folderName){
-		fs.mkdir(currentPath + folderName, 0777, function(err){
-			if (err){
+	socket.on('newFolder', function(folderName) {
+		fs.mkdir(currentPath + folderName, 0777, function(err) {
+			if (err) {
 				socket.emit('newFolderReply', err);
 			} else {
 				refreshNavLinks();
@@ -174,8 +179,8 @@ io.sockets.on('connection', function (socket){
 		});
 	});
 	
-	// for each file within root directory, if it doesn't exist then throw it back at the client to deal with
-	socket.on('validateLinks', function(internalLinks){
+	// for each file within root directory, if it doesn't exist then throw it back at the socket to deal with
+	socket.on('validateLinks', function(internalLinks) {
 		var i, j, found, linkPath, fileName;
 		var missingLinks = [];
 		
@@ -190,17 +195,17 @@ io.sockets.on('connection', function (socket){
 		socket.emit('validateLinksReply', {links: missingLinks});
 	});
 
-	function refreshNavLinks(){
+	function refreshNavLinks() {
 		refreshDir();
 		links = getDir.parseLinks(dir, directoryDepth);
 		socket.emit('navLinks', {links: links});
 	}
 
-	function refreshDir(){
+	function refreshDir() {
 		dir = getDir.getDir(currentPath);
-		if (typeof dir != 'undefined'){
-			dir.forEach(function(i){
-				if (i.folder == true){
+		if (typeof dir != 'undefined') {
+			dir.forEach(function(i) {
+				if (i.folder == true) {
 					dirFolders.push(i.name);
 				}
 			});
@@ -211,8 +216,8 @@ io.sockets.on('connection', function (socket){
 if (exports.gitMode == true) {
 	console.log('Using git mode.');
 }
-if (listenAddr != "") {
-	console.log("server started, addr:port = %s:%s", listenAddr, portNumber);
+if (listenAddr != '') {
+	console.log('server started, addr:port = %s:%s', listenAddr, portNumber);
 } else {
-	console.log("server started, port = " + portNumber);
+	console.log('server started, port = ' + portNumber);
 }

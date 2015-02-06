@@ -1,26 +1,28 @@
 {
-	"name": "vonwiki",
-	"version": "0.1.2",
-	"author": "Nafis Hossain <nhoss2@gmail.com>",
-	"description": "A simple wiki that uses markdown files",
-	"license": "MIT",
-	"scripts": {
-		"start": "vonwiki.js"
-	},
-	"engines": {
-		"node": ">=0.6.x"
-	},
-	"main": "vonwiki.js",
-	"bin": "./vonwiki.js",
-	"subdomain": "vonwiki",
-	"dependencies": {
-		"connect": "2.3.x",
-		"socket.io": "0.9.x",
-		"marked": "0.2.x",
-		"posix-getopt": "1.0.x"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git://github.com/vonWolfehaus/von-wiki.git"
-	}
+  "name": "vonwiki",
+  "version": "0.1.2",
+  "author": "Nafis Hossain <nhoss2@gmail.com>",
+  "description": "A simple wiki that uses markdown files",
+  "license": "MIT",
+  "scripts": {
+    "start": "vonwiki.js"
+  },
+  "engines": {
+    "node": ">=0.10.x"
+  },
+  "main": "vonwiki.js",
+  "bin": "./vonwiki.js",
+  "subdomain": "vonwiki",
+  "dependencies": {
+    "marked": "0.2.x",
+    "posix-getopt": "1.0.x",
+    "socket.io": "~1.2.1",
+    "connect": "~3.3.4",
+    "compression": "~1.4.0",
+    "serve-static": "~1.8.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/vonWolfehaus/von-wiki.git"
+  }
 }
