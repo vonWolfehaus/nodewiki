@@ -5,110 +5,30 @@ var http = require('http');
 var path = require('path');
 var connect = require('connect');
 var socketio = require('socket.io');
-var mod_getopt = require('posix-getopt');
+// var mod_getopt = require('posix-getopt');
 var compression = require('compression');
 var serveStatic = require('serve-static');
 
-var mdserver = require('./lib/mdserver');
-var getDir = require('./lib/getDir');
+var mdserver = require('./server/mdserver');
+var getDir = require('./server/getDir');
 
 // Defaults
-var portNumberDefault = process.env.PORT || 8888;
-var listenAddr = process.env.NW_ADDR || '';    // '' ==> INADDR_ANY
-
-exports.gitMode = false;  // exported for lib/mdserver.js
-
-var portNumber = portNumberDefault;
-
-// Process command line
-var parser, option;
-parser = new mod_getopt.BasicParser('a:(addr)g(git)h(help)l(local)p:(port)', process.argv);
-
-while ((option = parser.getopt()) !== undefined) {
-
-	switch (option.option) {
-
-	case 'a':
-		listenAddr = option.optarg;
-		break;
-
-	case 'g':
-		if (fs.existsSync(process.cwd() + '/.git')) {
-			exports.gitMode = true;
-		} else {
-			console.log(
-				'ERROR: No git repository found\n',
-				'\'--git\' requires a git repository in the current directory.\n',
-				'Type \'git init\' to create one.');
-			process.exit(1);
-		}
-		break;
-
-	case 'h':
-		showHelp();
-		process.exit(0);
-		break;
-
-	case 'l':
-		if (listenAddr != '') {
-			console.log('ERROR: Conflicting use of --addr and --local.\n',
-									'Use only one.');
-			process.exit(1);
-		}
-		listenAddr = 'localhost';
-		break;
-
-	case 'p':
-		var argPort = parseInt(option.optarg);
-		if (typeof argPort == 'number' && argPort > 0) {
-			portNumber = argPort;
-		} else {
-			console.log('ERROR: %s is not a valid port number.\n', option.optarg);
-			process.exit(1);
-		}
-		break;
-
-	default:
-		/* error message already emitted by getopt() */
-		console.assert('?' == option.option);
-		showUsage();
-		process.exit(1);
-		break;
-	}
-}
-
-function showHelp() {
-	console.log('VonWiki', '\n---------');
-	showUsage();
-}
-
-function showUsage() {
-	console.log(
-		'usage: vonwiki [--addr=<addr> | --local] [--git] [--help] [--port=<portnumber>]\n',
-		'  -a | --addr   IPv4 listen address (default = any)\n',
-		'  -g | --git    Commit each save to a git repository\n',
-		'  -h | --help   Print this message\n',
-		'  -l | --local  Listen on \'localhost\' (127.0.0.1) only.\n',
-		'  -p | --port   Use the specified port'
-	);
-}
-
-// end of command line processing
-
-
+var portNumber = process.env.PORT || 8888;
 var app = connect();
 
-// gzip/deflate outgoing responses
-app.use(compression());
+/*
+	Middleware
+ */
 
-app.use(serveStatic(__dirname + '/static'));
+app.use(compression()); // gzip/deflate outgoing responses
+app.use(serveStatic(__dirname + '/old'));
+
+/*
+	Create server
+ */
 
 var server = http.createServer(app);
-server.listen(portNumber, listenAddr);
-
-var io = socketio({
-	// config
-}).listen(server);
+var io = socketio(server);
 
 var allFiles = null;
 
@@ -127,7 +47,7 @@ io.sockets.on('connection', function (socket) {
 	socket.emit('navLinks', {links: links});
 	
 	allFiles = getDir.getAllFiles(currentPath);
-	// console.log(allFiles);
+	console.log(allFiles);
 	
 	socket.on('readFile', function (file) {
 		console.log('readFile received - ' + file.name);
@@ -213,11 +133,13 @@ io.sockets.on('connection', function (socket) {
 	}
 
 });
-if (exports.gitMode == true) {
-	console.log('Using git mode.');
-}
-if (listenAddr != '') {
-	console.log('server started, addr:port = %s:%s', listenAddr, portNumber);
-} else {
-	console.log('server started, port = ' + portNumber);
-}
+
+/*
+	Start server
+ */
+
+server.listen(portNumber, function() {
+	console.log('Server started, listening on ' + portNumber);
+});
+
+module.exports = app;

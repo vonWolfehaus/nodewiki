@@ -1,0 +1,39 @@
+/*
+  Utilities
+*/
+/*
+  Media queries
+*/
+html {
+  position: relative;
+  min-height: 100%; }
+
+body {
+  margin-bottom: 75px;
+  font-family: 'Helvetica Neue Light', 'Helvetica', 'Arial', sans-serif;
+  -webkit-font-smoothing: antialiased; }
+
+nav-dir {
+  user-select: none; }
+
+nav-dir span {
+  display: block; }
+
+.navbar-nav img {
+  width: 30px;
+  height: 30px;
+  margin: -15px 15px -15px; }
+
+.alert {
+  margin-top: 20px; }
+
+.thumbnail {
+  padding: 0;
+  border-radius: 0;
+  box-shadow: 0 0 5px #ccc, inset 0 0 0 #000; }
+
+.fa, [class^="ion-"] {
+  margin-right: 5px; }
+
+
+/*# sourceMappingURL=main.css.map */

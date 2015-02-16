@@ -1,0 +1,11 @@
+{
+	"undef": true,
+	"unused": "vars",
+	"predef": [
+		"window", "document", "navigator", "THREE", "PIXI", "localStorage"
+	],
+	"node": true,
+	"maxerr": 5,
+	"debug": true,
+	"unused": false
+}

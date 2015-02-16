@@ -43,12 +43,12 @@ function saveFile(file, directory, socket){
 				var markdownParsed = marked(file.content);
 				socket.emit('saveFileReply', {fileContents: markdownParsed, error: {error: false}, rawMd: file.content, fileName: file.name});
 					
-					if (vonwiki.gitMode == true) {
+					/*if (vonwiki.gitMode == true) {
 						git.commit(file, directory);
 						console.log('git.commit called');
 					} else {
 						console.log('git commit not called');
-					}
+					}*/
 					
 			}
 		});

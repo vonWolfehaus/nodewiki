@@ -1,0 +1,57 @@
+@import "variables";
+@import "mixins";
+
+// Scaffolding
+// -------------------------
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 75px;
+  font-family: $font-stack;
+  -webkit-font-smoothing: antialiased;
+}
+
+nav-dir {
+  user-select: none;
+}
+
+nav-dir span {
+  display: block;
+}
+
+// Navbar
+// -------------------------
+
+.navbar-nav img {
+  width: 30px;
+  height: 30px;
+  margin: -15px 15px -15px;
+}
+
+// Alerts
+// -------------------------
+
+.alert {
+  margin-top: 20px;
+}
+
+// Thumbnails
+// -------------------------
+
+.thumbnail {
+  padding: 0;
+  border-radius: 0;
+  box-shadow: 0 0 5px #ccc, inset 0 0 0 #000;
+}
+
+// Font Icons
+// -------------------------
+
+.fa,
+[class^="ion-"] {
+  margin-right: 5px;
+}
