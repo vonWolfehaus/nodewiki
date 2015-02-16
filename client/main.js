@@ -742,6 +742,7 @@ riot.tag('nav-dir', '<h1>{ opts.name }</h1> <div id="js-top"> </div>', function(
 	this.folders = {};
 	
 	this.on('mount', function() {
+		console.log('Running...');
 		var i, pathParts, itemName, folder;
 		var tree = this.data.repo.tree;
 		var folderParentEl = document.getElementById('js-top');
@@ -769,7 +770,7 @@ riot.tag('nav-dir', '<h1>{ opts.name }</h1> <div id="js-top"> </div>', function(
 
 		this.traverse(2);
 		
-	});
+	}.bind(this));
 
 	this.traverse = function(level) {
 		var i, item, pathParts, pathPartsClone, folder, parent, parentFolder;

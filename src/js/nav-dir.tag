@@ -13,6 +13,7 @@ var NavList = require('./nav-list.tag');
 	this.folders = {};
 	
 	this.on('mount', function() {
+		console.log('Running...');
 		var i, pathParts, itemName, folder;
 		var tree = this.data.repo.tree;
 		var folderParentEl = document.getElementById('js-top');
@@ -43,7 +44,7 @@ var NavList = require('./nav-list.tag');
 		// recursively traverse through all subfolders, starting with the second
 		this.traverse(2);
 		
-	});
+	}.bind(this));
 
 	traverse(level) {
 		var i, item, pathParts, pathPartsClone, folder, parent, parentFolder;
