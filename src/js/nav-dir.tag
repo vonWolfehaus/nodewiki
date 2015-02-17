@@ -1,4 +1,6 @@
 var riot = require('riot');
+var riotcontrol = require('riotcontrol');
+var humane = require('humane-js');
 
 var NavList = require('./nav-list.tag');
 
@@ -13,7 +15,6 @@ var NavList = require('./nav-list.tag');
 	this.folders = {};
 	
 	this.on('mount', function() {
-		console.log('Running...');
 		var i, pathParts, itemName, folder;
 		var tree = this.data.repo.tree;
 		var folderParentEl = document.getElementById('js-top');
@@ -87,6 +88,7 @@ var NavList = require('./nav-list.tag');
 		var tree = this.data.repo.tree;
 		var folderParentEl = document.getElementById('js-top');
 		var fileType = 'md';
+		var loadedDefault = false;
 		
 		// we have to loop through it again to add all items after this.folders have been attached to the DOM.
 		// this way this.folders always appear above files as expected
@@ -112,6 +114,14 @@ var NavList = require('./nav-list.tag');
 			}
 			else {
 				riot.mountTo(folderParentEl, 'nav-item', item);
+				
+				var ln = fileParts[0].toLowerCase();
+				if (!loadedDefault && (ln === 'readme' || ln === 'index')) {
+					// load a file immediately if a main on is there
+					loadedDefault = true;
+					riotcontrol.trigger('load-item', item);
+					// console.log(item);
+				}
 			}
 		}
 		

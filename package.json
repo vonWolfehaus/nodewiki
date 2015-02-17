@@ -14,7 +14,7 @@
     "browserify": "^8.0.2",
     "browserify-shim": "^3.8.2",
     "gulp": "^3.8.7",
-    "gulp-autoprefixer": "^2.0.0",
+    "gulp-autoprefixer": "~2.1.0",
     "gulp-changed": "^0.4.1",
     "gulp-filesize": "0.0.6",
     "gulp-iconfont": "^1.0.0",
@@ -29,7 +29,7 @@
     "gulp-util": "^3.0.0",
     "lodash": "^2.4.1",
     "pretty-hrtime": "~0.2.1",
-    "require-dir": "^0.1.0",
+    "require-dir": "~0.1.0",
     "vinyl-source-stream": "~0.1.1",
     "watchify": "^2.2.1",
     "riotify": "0.0.7",
@@ -41,18 +41,17 @@
     "gulp-concat": "~2.4.3",
     "yargs": "~3.0.4",
     "jshint-stylish": "~1.0.0",
-    "require-dir": "~0.1.0",
-    "gulp-notify": "~2.2.0",
     "fs-extra": "~0.16.3",
     "del": "~1.1.1"
   },
   "dependencies": {
-    "marked": "0.2.x",
+    "marked": "~0.2.10",
     "socket.io": "~1.2.1",
     "connect": "~3.3.4",
     "compression": "~1.4.0",
     "serve-static": "~1.8.1",
-    "riot": "~2.0.7"
+    "riot": "~2.0.7",
+    "humane-js": "~3.2.2"
   },
   "repository": {
     "type": "git",

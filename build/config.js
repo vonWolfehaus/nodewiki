@@ -14,7 +14,10 @@ module.exports = {
 	sass: {
 		src: src+'style/**/*.{sass,scss}',
 		cssLib: src+'style/lib',
-		dest: dest
+		dest: dest,
+		settings: {
+			imagePath: 'img' // Used by the image-url helper
+		}
 	},
 	html: {
 		src: src+'htdocs/**',
@@ -29,14 +32,14 @@ module.exports = {
 		debug: false,
 		paths: ['../node_modules', jsFolder, js.libs], // allows you to omit './' when requiring local modules
 		extensions: ['.jsx', '.tag'],
-		noparse: js.libs,
+		noparse: [],
 	},
 	browserifyDebug: {
 		entries: js.entries,
 		debug: true,
 		paths: ['../node_modules', jsFolder, js.libs], // allows you to omit './' when requiring local modules
 		extensions: ['.jsx', '.tag'],
-		noparse: js.libs,
+		noparse: [],
 		cache: {}, packageCache: {}, fullPaths: true // required by watchify
 	},
 	js: js,

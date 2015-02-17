@@ -4,54 +4,139 @@
 // Scaffolding
 // -------------------------
 
+* {
+	box-sizing: border-box;
+}
+
 html {
-  position: relative;
-  min-height: 100%;
+	position: relative;
+	min-height: 100%;
 }
 
 body {
-  margin-bottom: 75px;
-  font-family: $font-stack;
-  -webkit-font-smoothing: antialiased;
+	margin-bottom: 75px;
+	font-family: $font-stack;
+	font-smoothing: antialiased;
+	background-image: url("img/nodebg.jpg");
+	
 }
 
-nav-dir {
-  user-select: none;
+#content {
+	display: flex;
+	flex-direction: row;
+	flex-flow: center;
+	
+	margin: 20px auto;
+	padding: 10px;
 }
 
-nav-dir span {
-  display: block;
+#main-column {
+	width: 100%;
 }
+
+/*
+	Components
+*/
 
 // Navbar
 // -------------------------
 
-.navbar-nav img {
-  width: 30px;
-  height: 30px;
-  margin: -15px 15px -15px;
+nav-dir {
+	flex-shrink: 0; // never allow the sidebar to shrink, only grow as needed
+	min-width: 150px;
+	
+	@include no-select;
+	color: #fff;
+	font-size: 1rem;
+	margin-top: 20px;
+	background: #242425;
+	border-radius: 7px 0 0 7px;
+	border: solid 1px #000;
+	padding: 5px;
+	
+	h1 {
+		margin: 0.5em 0.1em;
+		color: #fff;
+		font-size: 1.5em;
+	}
 }
 
-// Alerts
-// -------------------------
-
-.alert {
-  margin-top: 20px;
+nav-dir ul {
+	padding-left: 10px;
+	margin: 0;
 }
 
-// Thumbnails
-// -------------------------
-
-.thumbnail {
-  padding: 0;
-  border-radius: 0;
-  box-shadow: 0 0 5px #ccc, inset 0 0 0 #000;
+nav-dir span,
+nav-dir li {
+	padding-left: 5px;
+	display: block;
+	cursor: pointer;
 }
 
-// Font Icons
+nav-dir span:hover,
+nav-dir li:hover {
+	background-color: rgba(0,0,0,0.5);
+}
+
+nav-dir li {
+	padding-left: 10px;
+}
+
+nav-dir li.selected {
+	background-color: #999;
+	color: #000;
+}
+
+// Content header
 // -------------------------
 
-.fa,
-[class^="ion-"] {
-  margin-right: 5px;
+content-header {
+	display: block;
+	
+	
+	border-radius: 8px 8px 0 0;
+	background: #eaeaea;
+	background: linear-gradient(top, #eaeaea 0%,#dddddd 100%);
+	border-bottom: 1px solid #cbcbcb;
+	padding: 20px;
+	color: #484848;
+	text-shadow: 0px 1px 0px #ffffff;
+	
+	h2 {
+		margin: 0;
+	}
+}
+
+// File view
+// -------------------------
+
+file-view {
+	display: block;
+	min-height: 500px;
+	
+	padding: 20px;
+	background-color: #fff;
+
+	p {
+		margin: 10px 0;
+	}
+
+	a {
+		color: #1563f1;
+	}
+	a.link-missing{
+		color: #F18315;
+	}
+	
+}
+
+#drop-zone {
+	text-align: center;
+	min-height: 100px;
+	background-color: #eee;
+	padding: 20px;
+}
+
+#drop-zone.dropping {
+	border: 5px dashed #0f0;
 }

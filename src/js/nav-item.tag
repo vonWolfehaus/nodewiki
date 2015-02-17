@@ -1,4 +1,6 @@
-var utils = require('./utils');
+var riotcontrol = require('riotcontrol');
+
+var utils = require('utils');
 
 <nav-item>
 
@@ -9,17 +11,14 @@ var utils = require('./utils');
 	this.content = null;
 	// console.log(this);
 	
-	open (e) {
-		var self = this;
-		/*utils.ajax('GET', this.data.url).then(function (res) {
-			self.opened = true;
-			var json = JSON.parse(res);
-			this.content = window.atob(json.content);
-			// todo: trigger global event to display content
-		},
-		function (err) {
-			console.warn(err);
-		});*/
+	open() {
+		riotcontrol.trigger('load-item', this.data);
+		this.opened = true;
+		riot.update('nav-dir');
 	}
+	
+	riotcontrol.on('load-item', function() {
+		this.opened = false;
+	}.bind(this));
 
 </nav-item>
