@@ -9,8 +9,8 @@ var socketio = require('socket.io');
 var compression = require('compression');
 var serveStatic = require('serve-static');
 
-var mdserver = require('./server/mdserver');
-var getDir = require('./server/getDir');
+var mdserver = require('./mdserver');
+var getDir = require('./getDir');
 
 // Defaults
 var portNumber = process.env.PORT || 8888;
@@ -21,7 +21,7 @@ var app = connect();
  */
 
 app.use(compression()); // gzip/deflate outgoing responses
-app.use(serveStatic(__dirname + '/old'));
+app.use(serveStatic('../client'));
 
 /*
 	Create server
@@ -39,7 +39,7 @@ io.sockets.on('connection', function (socket) {
 	var directoryDepth = 0;
 	var dirFolders = []; // array to hold the names of all folders in current directory
 	
-	dir.forEach(function(i) {
+	/*dir.forEach(function(i) {
 		if (i.folder == true) {
 			dirFolders.push(i.name);
 		}
@@ -47,7 +47,7 @@ io.sockets.on('connection', function (socket) {
 	socket.emit('navLinks', {links: links});
 	
 	allFiles = getDir.getAllFiles(currentPath);
-	console.log(allFiles);
+	console.log(allFiles);*/
 	
 	socket.on('readFile', function (file) {
 		console.log('readFile received - ' + file.name);

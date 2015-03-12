@@ -18,6 +18,7 @@ var utils = require('utils');
 	}
 	
 	riotcontrol.on('load-item', function() {
+		// turn off any open item
 		this.opened = false;
 	}.bind(this));
 

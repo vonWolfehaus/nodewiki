@@ -3,7 +3,7 @@ var path = require("path");
 var marked = require("marked");
 var allowedExtensions = require("./allowedExtensions");
 var git = require("./git");
-var vonwiki = require("../app");
+var vonwiki = require("./app");
 
 marked.setOptions({
 	gfm: true,

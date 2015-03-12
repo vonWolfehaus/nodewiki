@@ -6,45 +6,17 @@ var NavList = require('./nav-list.tag');
 
 <nav-dir>
 	
-	<h1>{ opts.name }</h1>
+	<h1>{ name }</h1>
 	<div id="js-top">
 		
 	</div>
 	
-	this.data = opts;
+	this.name = '';
 	this.folders = {};
+	this.element = null;
 	
 	this.on('mount', function() {
-		var i, pathParts, itemName, folder;
-		var tree = this.data.repo.tree;
-		var folderParentEl = document.getElementById('js-top');
-		
-		for (i = 0; i < tree.length; i++) {
-			item = tree[i];
-			if (item.type !== 'tree') {
-				continue;
-			}
-			
-			pathParts = item.path.split('/');
-			itemName = pathParts.pop();
-			folder = pathParts.join('/');
-			item.name = itemName;
-			
-			if (pathParts.length > 0) {
-				/*
-					because riot batches DOM manipulations, we have to set which index this folder's data belongs to, so that we can later attach folders only when they've been added to the dom.
-				*/
-				this.folders[folder+'/'+itemName] = i;
-			}
-			else {
-				// root folder so attach directly to the top div; no parent to add to
-				this.folders[itemName] = riot.mountTo(folderParentEl, 'nav-list', item);
-			}
-		}
-		
-		// recursively traverse through all subfolders, starting with the second
-		this.traverse(2);
-		
+		this.element = document.getElementById('js-top');
 	}.bind(this));
 
 	traverse(level) {
@@ -86,7 +58,6 @@ var NavList = require('./nav-list.tag');
 	addFiles() {
 		var i, pathParts, itemName, folder, fileParts;
 		var tree = this.data.repo.tree;
-		var folderParentEl = document.getElementById('js-top');
 		var fileType = 'md';
 		var loadedDefault = false;
 		
@@ -113,7 +84,7 @@ var NavList = require('./nav-list.tag');
 				this.folders[folder].add(item);
 			}
 			else {
-				riot.mountTo(folderParentEl, 'nav-item', item);
+				riot.mountTo(this.element, 'nav-item', item);
 				
 				var ln = fileParts[0].toLowerCase();
 				if (!loadedDefault && (ln === 'readme' || ln === 'index')) {
@@ -125,8 +96,47 @@ var NavList = require('./nav-list.tag');
 			}
 		}
 		
-		// force an update since neither the dom nor riot were triggered to do it for us
+		// force an update since nothing triggered it for us
 		riot.update();
 	}
+	
+	riotcontrol.on('render-repo', function(repo) {
+		var i, pathParts, itemName, folder;
+		console.log('nav-dir got repo:');
+		console.log(repo);
+		return;
+		var tree = this.data.repo.tree;
+		
+		/*var repoParts = repo.url.split('/');
+		var repoName = repoParts[repoParts.length-4];
+		
+		this.name = repoName;*/
+		
+		for (i = 0; i < tree.length; i++) {
+			item = tree[i];
+			if (item.type !== 'tree') {
+				continue;
+			}
+			
+			pathParts = item.path.split('/');
+			itemName = pathParts.pop();
+			folder = pathParts.join('/');
+			item.name = itemName;
+			
+			if (pathParts.length > 0) {
+				/*
+					because riot batches DOM manipulations, we have to set which index this folder's data belongs to, so that we can later attach folders only when they've been added to the dom.
+				*/
+				this.folders[folder+'/'+itemName] = i;
+			}
+			else {
+				// root folder so attach directly to the top div; no parent to add to
+				this.folders[itemName] = riot.mountTo(this.element, 'nav-list', item);
+			}
+		}
+		
+		// recursively traverse through all subfolders, starting with the second
+		this.traverse(2);
+	}.bind(this));
 
 </nav-dir>

@@ -10,7 +10,6 @@
 
 html {
 	position: relative;
-	min-height: 100%;
 }
 
 body {
@@ -114,6 +113,7 @@ file-view {
 	display: block;
 	min-height: 500px;
 	
+	@include no-select;
 	padding: 20px;
 	background-color: #fff;
 
@@ -131,12 +131,15 @@ file-view {
 }
 
 #drop-zone {
-	text-align: center;
-	min-height: 100px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	
+	min-height: 200px;
 	background-color: #eee;
 	padding: 20px;
 }
 
 #drop-zone.dropping {
-	border: 5px dashed #0f0;
+	border: 2px dashed #3381d4;
 }

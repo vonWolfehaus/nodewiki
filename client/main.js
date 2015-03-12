@@ -16,11 +16,7 @@ riotcontrol.addStore(new StoreRouter());
 riotcontrol.addStore(new LocalStore());
 riotcontrol.addStore(new RemoteStore());
 
-riot.mount('file-view');
-riot.mount('content-header');
-
-// todo: listen for the global even of that button press (when the user submits a repo to get)
-utils.ajax('GET', 'https://dl.dropboxusercontent.com/u/36067312/von-component.json').then(ajaxSuccess, ajaxFail);
+riot.mount('*');
 
 function ajaxSuccess(res) {
 	var repo = JSON.parse(res);
@@ -28,16 +24,17 @@ function ajaxSuccess(res) {
 		console.warn('The repository is too big, so only part of it is displayed.');
 	}
 	
-	var repoParts = repo.url.split('/');
-	var repoName = repoParts[repoParts.length-4];
-	
-	riot.mount('nav-dir', {name: repoName, repo: repo});
-	// riotcontrol.trigger('', repo);	
+	riotcontrol.trigger('render-repo', repo);	
 }
 
 function ajaxFail(err) {
 	console.log(err);
 }
+
+riotcontrol.on('ui-submit', function(url) {
+	url = url || 'https://dl.dropboxusercontent.com/u/36067312/von-component.json';
+	utils.ajax('GET', url).then(ajaxSuccess, ajaxFail);
+});
 
 },{"LocalStore":"D:\\git\\von-wiki\\src\\js\\LocalStore.js","RemoteStore":"D:\\git\\von-wiki\\src\\js\\RemoteStore.js","StoreRouter":"D:\\git\\von-wiki\\src\\js\\StoreRouter.js","content-header.tag":"D:\\git\\von-wiki\\src\\js\\content-header.tag","file-view.tag":"D:\\git\\von-wiki\\src\\js\\file-view.tag","humane-js":"D:\\git\\von-wiki\\node_modules\\humane-js\\humane.js","nav-dir.tag":"D:\\git\\von-wiki\\src\\js\\nav-dir.tag","riot":"D:\\git\\von-wiki\\node_modules\\riot\\riot.js","riotcontrol":"D:\\git\\von-wiki\\src\\js\\riotcontrol.js","utils":"D:\\git\\von-wiki\\src\\js\\utils.js"}],"D:\\git\\von-wiki\\node_modules\\humane-js\\humane.js":[function(require,module,exports){
 /**
@@ -2168,8 +2165,9 @@ function LocalStore() {
 	
 	this.on('local-load', function(data) {
 		this.data = data;
-		console.log('[LocalStore] put-local');
+		console.log('[LocalStore] local-load');
 		console.log(data);
+		// riotcontrol.trigger('render-md', content);
 	}.bind(this));
 
 	// Search our item collection.
@@ -2308,26 +2306,30 @@ riot.tag('drop-zone', '<div id="drop-zone" ondrop="{drop}" ondragover="{allowDro
 
 		
 		var items = evt.dataTransfer.items;
-
-
-		
 		var i, item, entry;
-		for (i = 0; i < items.length; i++) {
-			item = items[i];
+		
+		item = items[0];
+
+
 			if (item.kind !== 'file') {
-				continue;
+				console.warn('Only folders are accepted');
 			}
 			
 			entry = item.webkitGetAsEntry();
-
+			console.log(entry);
 			
 			if (entry.isDirectory) {
+				this.dropData = {
+					tree: [],
+					truncated: false
+				};
 				this.readFileTree(entry);
 			}
 			else {
 				console.warn('Only folders are accepted');
 			}
-		}
+
+
 	}.bind(this);
 	
 	this.dragEnter = function(evt) {
@@ -2342,22 +2344,28 @@ riot.tag('drop-zone', '<div id="drop-zone" ondrop="{drop}" ondragover="{allowDro
 		evt.preventDefault();
 		
 		evt.dataTransfer.dropEffect = 'move';
-		return false;
 	}.bind(this);
 	
 	this.onError = function(evt) {
 		console.log(evt);
-		switch (evt.code) {
-			
-		}
+		
 	}.bind(this);
 	
 	
 	
 	this.readFile = function(fileEntry) {
 		
-		console.log(file);
 
+		var a = fileEntry.fullPath.split('/');
+		var folder = a[a.length-2];
+		a.splice(0, 2); // get rid of root folder
+		var i = a.indexOf(folder) + 1; // insert after where the folder appears
+		this.dropData.tree.splice(i, 0, {
+			path: a.join('/'),
+			type: 'blob',
+
+		});
+		
 	}.bind(this);
 	
 	this.readFileTree = function(itemEntry) {
@@ -2368,13 +2376,29 @@ riot.tag('drop-zone', '<div id="drop-zone" ondrop="{drop}" ondragover="{allowDro
 		}
 		else if (itemEntry.isDirectory) {
 			var dirReader = itemEntry.createReader();
+			var a = itemEntry.fullPath.split('/');
+			a.splice(0, 2); // get rid of empty string and root folder
+			
+			var p = null;
+			if (a.length === 0) {} // this is the root folder item itself, ignore it
+			else if (a.length === 1) p = itemEntry.name;
+			else p = a.join('/');
+			
+			if (p) {
+				this.dropData.tree.push({
+					path: p,
+					type: 'tree'
+				});
+			}
+			
+			console.log(this.dropData.tree);
 			
 			dirReader.readEntries(function(entries) {
 				var idx = entries.length;
 				while (idx--) {
 					self.readFileTree(entries[idx]);
 				}	
-			});
+			}, this.onError.bind(self));
 		}			
 	}.bind(this);
 	
@@ -2427,39 +2451,14 @@ var humane = require('humane-js');
 
 var NavList = require('./nav-list.tag');
 
-riot.tag('nav-dir', '<h1>{ opts.name }</h1> <div id="js-top"> </div>', function(opts) {
+riot.tag('nav-dir', '<h1>{ name }</h1> <div id="js-top"> </div>', function(opts) {
 	
-	this.data = opts;
+	this.name = '';
 	this.folders = {};
+	this.element = null;
 	
 	this.on('mount', function() {
-		var i, pathParts, itemName, folder;
-		var tree = this.data.repo.tree;
-		var folderParentEl = document.getElementById('js-top');
-		
-		for (i = 0; i < tree.length; i++) {
-			item = tree[i];
-			if (item.type !== 'tree') {
-				continue;
-			}
-			
-			pathParts = item.path.split('/');
-			itemName = pathParts.pop();
-			folder = pathParts.join('/');
-			item.name = itemName;
-			
-			if (pathParts.length > 0) {
-				
-				this.folders[folder+'/'+itemName] = i;
-			}
-			else {
-
-				this.folders[itemName] = riot.mountTo(folderParentEl, 'nav-list', item);
-			}
-		}
-
-		this.traverse(2);
-		
+		this.element = document.getElementById('js-top');
 	}.bind(this));
 
 	this.traverse = function(level) {
@@ -2501,7 +2500,6 @@ riot.tag('nav-dir', '<h1>{ opts.name }</h1> <div id="js-top"> </div>', function(
 	this.addFiles = function() {
 		var i, pathParts, itemName, folder, fileParts;
 		var tree = this.data.repo.tree;
-		var folderParentEl = document.getElementById('js-top');
 		var fileType = 'md';
 		var loadedDefault = false;
 
@@ -2524,7 +2522,7 @@ riot.tag('nav-dir', '<h1>{ opts.name }</h1> <div id="js-top"> </div>', function(
 				this.folders[folder].add(item);
 			}
 			else {
-				riot.mountTo(folderParentEl, 'nav-item', item);
+				riot.mountTo(this.element, 'nav-item', item);
 				
 				var ln = fileParts[0].toLowerCase();
 				if (!loadedDefault && (ln === 'readme' || ln === 'index')) {
@@ -2538,6 +2536,39 @@ riot.tag('nav-dir', '<h1>{ opts.name }</h1> <div id="js-top"> </div>', function(
 
 		riot.update();
 	}.bind(this);
+	
+	riotcontrol.on('render-repo', function(repo) {
+		var i, pathParts, itemName, folder;
+		console.log('nav-dir got repo:');
+		console.log(repo);
+		return;
+		var tree = this.data.repo.tree;
+		
+		
+		
+		for (i = 0; i < tree.length; i++) {
+			item = tree[i];
+			if (item.type !== 'tree') {
+				continue;
+			}
+			
+			pathParts = item.path.split('/');
+			itemName = pathParts.pop();
+			folder = pathParts.join('/');
+			item.name = itemName;
+			
+			if (pathParts.length > 0) {
+				
+				this.folders[folder+'/'+itemName] = i;
+			}
+			else {
+
+				this.folders[itemName] = riot.mountTo(this.element, 'nav-list', item);
+			}
+		}
+
+		this.traverse(2);
+	}.bind(this));
 
 
 });

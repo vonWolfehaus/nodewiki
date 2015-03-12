@@ -9,8 +9,9 @@ function LocalStore() {
 	
 	this.on('local-load', function(data) {
 		this.data = data;
-		console.log('[LocalStore] put-local');
+		console.log('[LocalStore] local-load');
 		console.log(data);
+		// riotcontrol.trigger('render-md', content);
 	}.bind(this));
 
 	// Search our item collection.

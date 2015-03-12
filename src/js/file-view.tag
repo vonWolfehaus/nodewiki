@@ -3,12 +3,13 @@ var humane = require('humane-js');
 
 var riotcontrol = require('riotcontrol');
 
-var DropZone = require('drop-zone.tag');
+// var DropZone = require('drop-zone.tag');
+var LoginForm = require('login-form.tag');
 
 <file-view>
 	
 	<div if={!open}>
-		<drop-zone></drop-zone>
+		<login-form></login-form>
 	</div>
 	<div id="markdown"></div>
 	

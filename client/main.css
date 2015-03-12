@@ -8,8 +8,7 @@
   box-sizing: border-box; }
 
 html {
-  position: relative;
-  min-height: 100%; }
+  position: relative; }
 
 body {
   margin-bottom: 75px;
@@ -97,6 +96,12 @@ content-header {
 file-view {
   display: block;
   min-height: 500px;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
   padding: 20px;
   background-color: #fff; }
   file-view p {
@@ -107,13 +112,24 @@ file-view {
     color: #F18315; }
 
 #drop-zone {
-  text-align: center;
-  min-height: 100px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  min-height: 200px;
   background-color: #eee;
   padding: 20px; }
 
 #drop-zone.dropping {
-  border: 5px dashed #0f0; }
+  border: 2px dashed #3381d4; }
 
 
 /*# sourceMappingURL=main.css.map */

@@ -23,26 +23,30 @@ var riotcontrol = require('riotcontrol');
 		// console.log(evt.dataTransfer);
 		
 		var items = evt.dataTransfer.items;
-		// var items = evt.dataTransfer.files;
-		// console.log(items);
-		
 		var i, item, entry;
-		for (i = 0; i < items.length; i++) {
-			item = items[i];
+		
+		item = items[0];
+		// for (i = 0; item = items[i]; i++) {
+			// item = items[i];
 			if (item.kind !== 'file') {
-				continue;
+				console.warn('Only folders are accepted');
 			}
 			
 			entry = item.webkitGetAsEntry();
-			// console.log(entry);
+			console.log(entry);
 			
 			if (entry.isDirectory) {
+				this.dropData = {
+					tree: [],
+					truncated: false
+				};
 				this.readFileTree(entry);
 			}
 			else {
 				console.warn('Only folders are accepted');
 			}
-		}
+		// }
+		// console.log(this.dropData);
 	}
 	
 	dragEnter(evt) {
@@ -57,14 +61,13 @@ var riotcontrol = require('riotcontrol');
 		evt.preventDefault();
 		
 		evt.dataTransfer.dropEffect = 'move';
-		return false;
 	}
 	
 	onError(evt) {
 		console.log(evt);
-		switch (evt.code) {
+		/*switch (evt.code) {
 			
-		}
+		}*/
 	}
 	
 	/*readDirectory(dirEntry, callback) {
@@ -91,8 +94,20 @@ var riotcontrol = require('riotcontrol');
 		/*fileEntry.file(function() {
 			console.log(arguments);
 		}.bind(this));*/
-		console.log(file);
-		// this.dropData[file.fullPath] = file;
+		// console.log(fileEntry);
+		var a = fileEntry.fullPath.split('/');
+		var folder = a[a.length-2];
+		a.splice(0, 2); // get rid of root folder
+		var i = a.indexOf(folder) + 1; // insert after where the folder appears
+		this.dropData.tree.splice(i, 0, {
+			path: a.join('/'),
+			type: 'blob',
+			// url: we need the absolute path here
+		});
+		/*this.dropData.tree.push({
+			path: a.join('/'),
+			type: 'blob'
+		});*/
 	}
 	
 	readFileTree(itemEntry) {
@@ -103,13 +118,29 @@ var riotcontrol = require('riotcontrol');
 		}
 		else if (itemEntry.isDirectory) {
 			var dirReader = itemEntry.createReader();
+			var a = itemEntry.fullPath.split('/');
+			a.splice(0, 2); // get rid of empty string and root folder
+			
+			var p = null;
+			if (a.length === 0) {} // this is the root folder item itself, ignore it
+			else if (a.length === 1) p = itemEntry.name;
+			else p = a.join('/');
+			
+			if (p) {
+				this.dropData.tree.push({
+					path: p,
+					type: 'tree'
+				});
+			}
+			
+			console.log(this.dropData.tree);
 			
 			dirReader.readEntries(function(entries) {
 				var idx = entries.length;
 				while (idx--) {
 					self.readFileTree(entries[idx]);
 				}	
-			});
+			}, this.onError.bind(self));
 		}			
 	}
 	/*readEntry(dirEntry) {
