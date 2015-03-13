@@ -13,7 +13,7 @@ var FileView = require('file-view.tag');
 var ContentHeader = require('content-header.tag');
 
 riotcontrol.addStore(new StoreRouter());
-riotcontrol.addStore(new LocalStore());
+// riotcontrol.addStore(new LocalStore());
 riotcontrol.addStore(new RemoteStore());
 
 riot.mount('*');
@@ -23,18 +23,18 @@ function ajaxSuccess(res) {
 	if (repo.truncated) {
 		console.warn('The repository is too big, so only part of it is displayed.');
 	}
-	
-	riotcontrol.trigger('render-repo', repo);	
+	console.log(repo);
+	// riotcontrol.trigger('render-repo', repo);	
 }
 
 function ajaxFail(err) {
 	console.log(err);
 }
 
-riotcontrol.on('ui-submit', function(url) {
-	url = url || 'https://dl.dropboxusercontent.com/u/36067312/von-component.json';
+// riotcontrol.on('ui-submit', function(url) {
+	var url = 'https://dl.dropboxusercontent.com/u/36067312/von-component.json';
 	utils.ajax('GET', url).then(ajaxSuccess, ajaxFail);
-});
+// });
 
 },{"LocalStore":"D:\\git\\von-wiki\\src\\js\\LocalStore.js","RemoteStore":"D:\\git\\von-wiki\\src\\js\\RemoteStore.js","StoreRouter":"D:\\git\\von-wiki\\src\\js\\StoreRouter.js","content-header.tag":"D:\\git\\von-wiki\\src\\js\\content-header.tag","file-view.tag":"D:\\git\\von-wiki\\src\\js\\file-view.tag","humane-js":"D:\\git\\von-wiki\\node_modules\\humane-js\\humane.js","nav-dir.tag":"D:\\git\\von-wiki\\src\\js\\nav-dir.tag","riot":"D:\\git\\von-wiki\\node_modules\\riot\\riot.js","riotcontrol":"D:\\git\\von-wiki\\src\\js\\riotcontrol.js","utils":"D:\\git\\von-wiki\\src\\js\\utils.js"}],"D:\\git\\von-wiki\\node_modules\\humane-js\\humane.js":[function(require,module,exports){
 /**
@@ -2283,139 +2283,17 @@ riot.tag('content-header', '<h2 id="markdown-title">wiki</h2>', function(opts) {
 	
 
 });
-},{"riot":"D:\\git\\von-wiki\\node_modules\\riot\\riot.js","riotcontrol":"D:\\git\\von-wiki\\src\\js\\riotcontrol.js"}],"D:\\git\\von-wiki\\src\\js\\drop-zone.tag":[function(require,module,exports){
-var riot = require('riot');
-var humane = require('humane-js');
-
-var riotcontrol = require('riotcontrol');
-
-riot.tag('drop-zone', '<div id="drop-zone" ondrop="{drop}" ondragover="{allowDrop}" ondragenter="{dragEnter}" ondragleave="{dragLeave}"> <span>Drag and drop a folder into this area.</span> </div>', function(opts) {
-	
-	this.dropData = null;
-	this.element = null;
-	
-	this.on('mount', function() {
-		this.element = document.getElementById('markdown');
-		this.dropElement = document.getElementById('drop-zone');
-	}.bind(this));
-	
-	this.drop = function(evt) {
-		evt.preventDefault();
-		evt.stopPropagation();
-
-
-		
-		var items = evt.dataTransfer.items;
-		var i, item, entry;
-		
-		item = items[0];
-
-
-			if (item.kind !== 'file') {
-				console.warn('Only folders are accepted');
-			}
-			
-			entry = item.webkitGetAsEntry();
-			console.log(entry);
-			
-			if (entry.isDirectory) {
-				this.dropData = {
-					tree: [],
-					truncated: false
-				};
-				this.readFileTree(entry);
-			}
-			else {
-				console.warn('Only folders are accepted');
-			}
-
-
-	}.bind(this);
-	
-	this.dragEnter = function(evt) {
-
-	}.bind(this);
-	
-	this.dragLeave = function(evt) {
-
-	}.bind(this);
-	
-	this.allowDrop = function(evt) {
-		evt.preventDefault();
-		
-		evt.dataTransfer.dropEffect = 'move';
-	}.bind(this);
-	
-	this.onError = function(evt) {
-		console.log(evt);
-		
-	}.bind(this);
-	
-	
-	
-	this.readFile = function(fileEntry) {
-		
-
-		var a = fileEntry.fullPath.split('/');
-		var folder = a[a.length-2];
-		a.splice(0, 2); // get rid of root folder
-		var i = a.indexOf(folder) + 1; // insert after where the folder appears
-		this.dropData.tree.splice(i, 0, {
-			path: a.join('/'),
-			type: 'blob',
-
-		});
-		
-	}.bind(this);
-	
-	this.readFileTree = function(itemEntry) {
-		var self = this;
-		
-		if (itemEntry.isFile) {
-			this.readFile(itemEntry);
-		}
-		else if (itemEntry.isDirectory) {
-			var dirReader = itemEntry.createReader();
-			var a = itemEntry.fullPath.split('/');
-			a.splice(0, 2); // get rid of empty string and root folder
-			
-			var p = null;
-			if (a.length === 0) {} // this is the root folder item itself, ignore it
-			else if (a.length === 1) p = itemEntry.name;
-			else p = a.join('/');
-			
-			if (p) {
-				this.dropData.tree.push({
-					path: p,
-					type: 'tree'
-				});
-			}
-			
-			console.log(this.dropData.tree);
-			
-			dirReader.readEntries(function(entries) {
-				var idx = entries.length;
-				while (idx--) {
-					self.readFileTree(entries[idx]);
-				}	
-			}, this.onError.bind(self));
-		}			
-	}.bind(this);
-	
-	
-
-
-});
-},{"humane-js":"D:\\git\\von-wiki\\node_modules\\humane-js\\humane.js","riot":"D:\\git\\von-wiki\\node_modules\\riot\\riot.js","riotcontrol":"D:\\git\\von-wiki\\src\\js\\riotcontrol.js"}],"D:\\git\\von-wiki\\src\\js\\file-view.tag":[function(require,module,exports){
+},{"riot":"D:\\git\\von-wiki\\node_modules\\riot\\riot.js","riotcontrol":"D:\\git\\von-wiki\\src\\js\\riotcontrol.js"}],"D:\\git\\von-wiki\\src\\js\\file-view.tag":[function(require,module,exports){
 var riot = require('riot');
 var marked = require('marked'); //https://github.com/chjj/marked
 var humane = require('humane-js');
 
 var riotcontrol = require('riotcontrol');
 
-var DropZone = require('drop-zone.tag');
+// var DropZone = require('drop-zone.tag');
+var LoginForm = require('login-form.tag');
 
-riot.tag('file-view', '<div if="{!open}"> <drop-zone></drop-zone> </div> <div id="markdown"></div>', function(opts) {
+riot.tag('file-view', '<div if="{!open}"> <login-form></login-form> </div> <div id="markdown"></div>', function(opts) {
 	
 	this.open = false;
 	this.markdown = null;
@@ -2443,7 +2321,17 @@ riot.tag('file-view', '<div if="{!open}"> <drop-zone></drop-zone> </div> <div id
 	
 
 });
-},{"drop-zone.tag":"D:\\git\\von-wiki\\src\\js\\drop-zone.tag","humane-js":"D:\\git\\von-wiki\\node_modules\\humane-js\\humane.js","marked":"D:\\git\\von-wiki\\node_modules\\marked\\lib\\marked.js","riot":"D:\\git\\von-wiki\\node_modules\\riot\\riot.js","riotcontrol":"D:\\git\\von-wiki\\src\\js\\riotcontrol.js"}],"D:\\git\\von-wiki\\src\\js\\nav-dir.tag":[function(require,module,exports){
+},{"humane-js":"D:\\git\\von-wiki\\node_modules\\humane-js\\humane.js","login-form.tag":"D:\\git\\von-wiki\\src\\js\\login-form.tag","marked":"D:\\git\\von-wiki\\node_modules\\marked\\lib\\marked.js","riot":"D:\\git\\von-wiki\\node_modules\\riot\\riot.js","riotcontrol":"D:\\git\\von-wiki\\src\\js\\riotcontrol.js"}],"D:\\git\\von-wiki\\src\\js\\login-form.tag":[function(require,module,exports){
+var riot = require('riot');
+var humane = require('humane-js');
+
+var riotcontrol = require('riotcontrol');
+
+riot.tag('login-form', '<div>Form</div>', function(opts) {
+
+
+});
+},{"humane-js":"D:\\git\\von-wiki\\node_modules\\humane-js\\humane.js","riot":"D:\\git\\von-wiki\\node_modules\\riot\\riot.js","riotcontrol":"D:\\git\\von-wiki\\src\\js\\riotcontrol.js"}],"D:\\git\\von-wiki\\src\\js\\nav-dir.tag":[function(require,module,exports){
 var riot = require('riot');
 var riot = require('riot');
 var riotcontrol = require('riotcontrol');
@@ -2592,6 +2480,7 @@ riot.tag('nav-item', '<li class="{ selected:opened }" onclick="{ open }">{ opts.
 	}.bind(this);
 	
 	riotcontrol.on('load-item', function() {
+
 		this.opened = false;
 	}.bind(this));
 

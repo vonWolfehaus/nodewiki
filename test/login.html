@@ -7,23 +7,54 @@
 
 	<title>von-wiki</title>
 	
-	<link href="../client/normalize.css" rel="stylesheet" type="text/css"/>
-	<link href="../client/main.css" rel="stylesheet" type="text/css"/>
+	<link href="css/normalize.css" rel="stylesheet" type="text/css"/>
+	<link href="css/main.css" rel="stylesheet" type="text/css"/>
+	<style type="text/css">
+	#github-form {
+		text-align: center;
+		margin-top: 20px;
+	}
+	button {
+		color: #FFF;
+		background: #0c5fad;
+		padding: 20px 60px;
+		-webkit-border-radius: 5px;
+		-moz-border-radius: 5px;
+		border-radius: 5px;
+		margin: 10px 0;
+		border: none;
+	}
+	button:hover {
+		background: #227fd6;
+	}
+	button:active {
+		background: #0e4f8c;
+	}
+	button:focus {
+		outline: none;
+	}
+	button[disabled] {
+		color: #555;
+		background: #aaa;
+	}
+	</style>
 </head>
 
 <body>
 	
-	<div id="content">
-		<nav-dir></nav-dir>
-		<div id="main-column">
-			<content-header></content-header>
-			<!-- <get-repo-form></get-repo-form> -->
-			<file-view></file-view>
-		</div>
-	</div>
+	<login></login>
 	
+	<div id="dump"></div>
+	
+	<script type="riot/tag" src="login.tag"></script>
+	
+	<script type="text/javascript" src="github.js"></script>
 	<script type="text/javascript" src="riot+compiler.min.js"></script>
-	<script type="text/javascript" src="main.js"></script>
+	<script type="text/javascript">
+	riot.compile(function() {
+    	riot.mount('*');
+    });
+	</script>
 	
 </body>
 </html>
