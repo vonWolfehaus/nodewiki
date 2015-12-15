@@ -13,7 +13,7 @@ var mdserver = require('./mdserver');
 var getDir = require('./getDir');
 
 // Defaults
-var portNumber = process.env.PORT || 8888;
+var portNumber = process.env.PORT || 9001;
 var app = connect();
 
 /*
@@ -139,7 +139,7 @@ io.sockets.on('connection', function (socket) {
  */
 
 server.listen(portNumber, function() {
-	console.log('Server started, listening on ' + portNumber);
+	console.log('Server started at http://localhost:' + portNumber);
 });
 
 module.exports = app;

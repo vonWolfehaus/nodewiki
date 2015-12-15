@@ -23,18 +23,18 @@ function ajaxSuccess(res) {
 	if (repo.truncated) {
 		console.warn('The repository is too big, so only part of it is displayed.');
 	}
-	console.log(repo);
-	// riotcontrol.trigger('render-repo', repo);	
+	
+	riotcontrol.trigger('render-repo', repo);	
 }
 
 function ajaxFail(err) {
 	console.log(err);
 }
 
-// riotcontrol.on('ui-submit', function(url) {
-	var url = 'https://dl.dropboxusercontent.com/u/36067312/von-component.json';
+riotcontrol.on('ui-submit', function(url) {
+	url = url || 'https://dl.dropboxusercontent.com/u/36067312/von-component.json';
 	utils.ajax('GET', url).then(ajaxSuccess, ajaxFail);
-// });
+});
 
 },{"LocalStore":"D:\\git\\von-wiki\\src\\js\\LocalStore.js","RemoteStore":"D:\\git\\von-wiki\\src\\js\\RemoteStore.js","StoreRouter":"D:\\git\\von-wiki\\src\\js\\StoreRouter.js","content-header.tag":"D:\\git\\von-wiki\\src\\js\\content-header.tag","file-view.tag":"D:\\git\\von-wiki\\src\\js\\file-view.tag","humane-js":"D:\\git\\von-wiki\\node_modules\\humane-js\\humane.js","nav-dir.tag":"D:\\git\\von-wiki\\src\\js\\nav-dir.tag","riot":"D:\\git\\von-wiki\\node_modules\\riot\\riot.js","riotcontrol":"D:\\git\\von-wiki\\src\\js\\riotcontrol.js","utils":"D:\\git\\von-wiki\\src\\js\\utils.js"}],"D:\\git\\von-wiki\\node_modules\\humane-js\\humane.js":[function(require,module,exports){
 /**

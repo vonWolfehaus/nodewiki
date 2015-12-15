@@ -88,7 +88,7 @@ var NavList = require('./nav-list.tag');
 				
 				var ln = fileParts[0].toLowerCase();
 				if (!loadedDefault && (ln === 'readme' || ln === 'index')) {
-					// load a file immediately if a main on is there
+					// load a file immediately if a main doc is there
 					loadedDefault = true;
 					riotcontrol.trigger('load-item', item);
 					// console.log(item);
@@ -96,7 +96,7 @@ var NavList = require('./nav-list.tag');
 			}
 		}
 		
-		// force an update since nothing triggered it for us
+		// force an update since nothing above triggered it for us
 		riot.update();
 	}
 	
